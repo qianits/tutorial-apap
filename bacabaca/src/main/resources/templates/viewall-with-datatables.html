@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+    <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable({
+                "paging": true, 
+                "pageLength": 5,
+                "lengthMenu": [5, 10, 20],
+                "columnDefs": [
+                    { "orderable": false, "targets": 5 } 
+                ]
+            });
+        });
+    </script>
+    <title>View All Buku</title>
+</head>
+
+<body>
+    <nav th:replace="fragments/navbar :: navbar(page = 'Buku')"></nav>
+    <div class="container">
+        <div class="text-center pt-5">
+            <h2>Daftar Buku</h2>
+        </div>
+
+        <div class="text-center m-3">
+            <a type="button" class="btn btn-primary m-2" href="/buku/create">Tambah Buku</a>
+            <a type="button" class="btn btn-md btn-primary" href="/">Home</a>
+        </div>
+
+        <table id="myTable" class="display">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Judul</th>
+                    <th>Nama Penulis</th>
+                    <th>Nama Penerbit</th>
+                    <th>Harga</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Gunakan th:each untuk mengulangi buku -->
+                <tr th:each="buku, index: ${listBuku}" th:if="${not buku.isDeleted}">
+                    <td th:text="${index.index + 1}"></td> 
+                    <td th:text="${buku.judul}"></td> 
+                    <td>
+                      <!-- Tampilkan pesan jika tidak ada penulis -->
+                      <span th:if="${buku.listPenulis.size() == 0}">Penulis belum ter-record</span>
+                      <div th:each="penulis, iterStat: ${buku.listPenulis}" >
+                        <!-- Gunakan th:each untuk mengulangi penulis dalam buku -->
+                        <span th:text="${penulis.namaPenulis} + ${!iterStat.last ? ', ' : ''}">
+                        </span>
+                      </div>
+                    </td>
+                    <td th:text="${buku.penerbit.namaPenerbit}"></td> 
+                    <td th:text="'Rp' + ${buku.harga}"></td> 
+                    <td>
+                        <!-- Tautan untuk Detail, Ubah, dan Hapus -->
+                        <a type="button" class="btn btn-md btn-primary"
+                            th:href="@{/buku/{id}(id=${buku.id})}">Detail</a>
+                        <a type="button" class="btn btn-md btn-warning"
+                            th:href="@{/buku/{id}/update(id=${buku.id})}">Ubah</a>
+                        <a type="button" class="btn btn-md btn-danger"
+                            th:href="@{/buku/{id}/delete(id=${buku.id})}">Hapus</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>
